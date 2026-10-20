@@ -1,0 +1,25 @@
+{
+  "_comment": "Repos always crawled, even if code search misses them. Topics are searched for more repos.",
+  "repos": [
+    "anthropics/skills",
+    "ComposioHQ/awesome-claude-skills",
+    "microsoft/skills",
+    "K-Dense-AI/claude-scientific-skills",
+    "trailofbits/skills",
+    "openai/skills",
+    "getsentry/skills",
+    "huggingface/skills",
+    "expo/skills",
+    "addyosmani/agent-skills",
+    "samber/cc-skills",
+    "hashicorp/agent-skills",
+    "cloudflare/skills",
+    "obra/superpowers",
+    "remotion-dev/skills",
+    "stripe/ai",
+    "vercel-labs/agent-skills",
+    "google-gemini/gemini-skills",
+    "supabase/agent-skills"
+  ],
+  "topics": ["claude-skills", "agent-skills", "claude-code-skills", "skills-md", "claude-skill"]
+}

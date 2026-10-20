@@ -1,0 +1,71 @@
+name: Crawl skills and deploy
+
+on:
+  schedule:
+    - cron: "17 3 * * *" # nightly, 03:17 UTC
+  workflow_dispatch:
+    inputs:
+      max_trees:
+        description: Repos to check this run
+        default: "3000"
+  push:
+    branches: [main]
+    paths-ignore: ["public/skills.json", "data/crawl-state.json"]
+
+permissions:
+  contents: write
+  pages: write
+  id-token: write
+
+concurrency:
+  group: crawl-and-deploy
+  cancel-in-progress: false
+
+jobs:
+  crawl:
+    if: github.event_name != 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 300
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Crawl GitHub for skills
+        env:
+          # A fine-grained personal access token with public read-only access.
+          # Falls back to the workflow token, which has a lower search rate limit.
+          GITHUB_TOKEN: ${{ secrets.CRAWLER_TOKEN || secrets.GITHUB_TOKEN }}
+          MAX_TREES: ${{ inputs.max_trees || '3000' }}
+          MIN_STARS: ${{ vars.MIN_STARS || '10' }}
+        run: node scripts/crawl.mjs
+      - name: Commit the updated index
+        run: |
+          git config user.name "skillo-crawler"
+          git config user.email "skillo-crawler@users.noreply.github.com"
+          git add public/skills.json data/crawl-state.json
+          git diff --cached --quiet || git commit -m "Update skill index"
+          git push
+
+  deploy:
+    needs: crawl
+    if: always() && (needs.crawl.result == 'success' || needs.crawl.result == 'skipped')
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: main
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run build
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: dist
+      - id: deployment
+        uses: actions/deploy-pages@v4

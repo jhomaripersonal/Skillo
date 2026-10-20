@@ -1,0 +1,21 @@
+{
+  "_comment": "GitHub owner login (lowercase) -> display name. official: true marks first-party publishers. Owners not listed show their login and are treated as community.",
+  "anthropics": { "name": "Anthropic", "official": true },
+  "cloudflare": { "name": "Cloudflare", "official": true },
+  "expo": { "name": "Expo", "official": true },
+  "getsentry": { "name": "Sentry", "official": true },
+  "google-gemini": { "name": "Google", "official": true },
+  "hashicorp": { "name": "HashiCorp", "official": true },
+  "huggingface": { "name": "Hugging Face", "official": true },
+  "microsoft": { "name": "Microsoft", "official": true },
+  "openai": { "name": "OpenAI", "official": true },
+  "remotion-dev": { "name": "Remotion", "official": true },
+  "stripe": { "name": "Stripe", "official": true },
+  "supabase": { "name": "Supabase", "official": true },
+  "trailofbits": { "name": "Trail of Bits", "official": true },
+  "vercel-labs": { "name": "Vercel", "official": true },
+  "composiohq": { "name": "Composio", "official": false },
+  "k-dense-ai": { "name": "K-Dense", "official": false },
+  "addyosmani": { "name": "Addy Osmani", "official": false },
+  "obra": { "name": "Superpowers (obra)", "official": false }
+}
