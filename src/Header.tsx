@@ -84,6 +84,23 @@ function CountUp({ to }: { to: number }) {
 
 const EASE = [0.16, 1, 0.3, 1] as const;
 
+// Counts each browser once via api/visits.ts. Stays null, and the stat hidden, where that isn't served (e.g. `vite` dev).
+const VISITED_KEY = "skillo-visited";
+function useVisitors() {
+  const [n, setN] = useState<number | null>(null);
+  useEffect(() => {
+    let seen = true;
+    try { seen = localStorage.getItem(VISITED_KEY) === "1"; } catch {}
+    fetch("/api/visits", { method: seen ? "GET" : "POST" })
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((d: { visitors: number }) => {
+        setN(d.visitors);
+        if (!seen) try { localStorage.setItem(VISITED_KEY, "1"); } catch {}
+      }, () => {});
+  }, []);
+  return n;
+}
+
 const rise = (delay: number) => ({
   initial: { opacity: 0, y: 24, filter: "blur(8px)" },
   animate: { opacity: 1, y: 0, filter: "blur(0px)", transition: { delay, duration: 0.7, ease: EASE } },
@@ -98,6 +115,7 @@ export function Hero({ heroRef, stats, ...search }: HeroProps) {
   const updated = stats?.generated
     ? new Date(stats.generated).toLocaleDateString(undefined, { day: "numeric", month: "short", year: "numeric" })
     : null;
+  const visitors = useVisitors();
   return (
     <section className="hero" aria-labelledby="hero-title">
       <div className="container hero-inner">
@@ -120,6 +138,7 @@ export function Hero({ heroRef, stats, ...search }: HeroProps) {
           <div><dt>Skills</dt><dd>{stats ? <CountUp to={stats.skills} /> : "—"}</dd></div>
           <div><dt>Repositories</dt><dd>{stats ? <CountUp to={stats.repos} /> : "—"}</dd></div>
           <div><dt>Publishers</dt><dd>{stats ? <CountUp to={stats.publishers} /> : "—"}</dd></div>
+          {visitors != null && <div><dt>Visitors</dt><dd><CountUp to={visitors} /></dd></div>}
           <div><dt>Last updated</dt><dd>{updated ?? "—"}</dd></div>
         </motion.dl>
       </div>
