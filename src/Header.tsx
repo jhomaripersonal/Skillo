@@ -3,7 +3,7 @@ import { animate, motion, useMotionValue, useReducedMotion, useTransform } from 
 import { CoffeeIcon, GitHubIcon, MoonIcon, SearchIcon, SunIcon } from "./icons";
 
 const THEME_KEY = "skillo-theme";
-export const COFFEE_URL = "https://buymeacoffee.com/YOUR_USERNAME";
+export const COFFEE_URL = "https://buymeacoffee.com/skillo.io";
 const SUGGESTIONS = ["pdf", "testing", "mcp", "deploy", "security", "react", "data analysis"];
 
 function currentTheme(): "light" | "dark" {
