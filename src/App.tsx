@@ -305,8 +305,8 @@ export default function App() {
               <li>
                 <span className="step-n">3</span>
                 <h3>Install with one command</h3>
-                <p>Copy the command to put the folder in <code>.claude/skills/</code>. For Codex, use <code>.agents/skills/</code>. No account needed.</p>
-                <code className="step-code">npx degit owner/repo/path .claude/skills/name</code>
+                <p>Copy the command to put the folder in <code>.claude/skills/</code>. For Codex, use <code>.agents/skills/</code>. It's pinned to the commit you read, so later changes upstream don't reach your agent until you choose to update.</p>
+                <code className="step-code">npx giget@3 gh:owner/repo/path#commit .claude/skills/name</code>
               </li>
             </ol>
             <div className="callout">

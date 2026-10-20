@@ -42,13 +42,17 @@ export function score(s: Skill, terms: string[]): number {
 
 const slug = (s: string) => s.toLowerCase().replace(/[^a-z0-9._-]+/g, "-");
 const dirPrefix = (s: Skill) => (s.p === "." ? "" : `${s.p}/`);
+// The commit the index was built from, so what you read is what you install. Older entries fall back to the branch.
+export const skillRef = (s: Skill) => s.repo.h ?? s.repo.b;
 
+// giget, unlike degit, can fetch any commit, not only branch and tag heads.
 export const installCmd = (s: Skill) =>
-  `npx degit ${s.r}${s.p === "." ? "" : `/${s.p}`} .claude/skills/${slug(s.n)}`;
-export const treeUrl = (s: Skill) => `https://github.com/${s.r}/tree/${s.repo.b}/${s.p === "." ? "" : s.p}`;
-export const blobUrl = (s: Skill, file: string) => `https://github.com/${s.r}/blob/${s.repo.b}/${dirPrefix(s)}${file}`;
+  `npx giget@3 gh:${s.r}${s.p === "." ? "" : `/${s.p}`}#${skillRef(s)} .claude/skills/${slug(s.n)}`;
+export const commitUrl = (s: Skill) => `https://github.com/${s.r}/commit/${s.repo.h}`;
+export const treeUrl = (s: Skill) => `https://github.com/${s.r}/tree/${skillRef(s)}/${s.p === "." ? "" : s.p}`;
+export const blobUrl = (s: Skill, file: string) => `https://github.com/${s.r}/blob/${skillRef(s)}/${dirPrefix(s)}${file}`;
 export const rawUrl = (s: Skill, file: string) =>
-  `https://raw.githubusercontent.com/${s.r}/${s.repo.b}/${dirPrefix(s)}${file}`;
+  `https://raw.githubusercontent.com/${s.r}/${skillRef(s)}/${dirPrefix(s)}${file}`;
 export const isCaution = (license: string) => !/^(MIT|Apache-2.0|BSD-|MPL-2.0|ISC|CC-BY|CC0|Unlicense)/.test(license);
 
 export const skillHref = (s: Skill) => `#/skill/${encodeURIComponent(s.id)}`;

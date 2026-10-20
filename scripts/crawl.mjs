@@ -9,6 +9,9 @@
 // pushed_at, so unchanged repos are not re-fetched and a large first crawl finishes over
 // several runs (MAX_TREES per run).
 //
+// Each repo is read at one commit, recorded as `h`, so the app shows and installs exactly
+// the files that were indexed rather than whatever the branch holds later.
+//
 // Env: GITHUB_TOKEN (required), MIN_STARS (default 10), MAX_TREES (default 3000),
 //      SEEDS_ONLY=1 to skip search, CONCURRENCY (default 12).
 
@@ -56,7 +59,7 @@ async function api(url, { accept = "application/vnd.github+json" } = {}) {
         "User-Agent": "skillo-crawler",
       },
     });
-    if (res.ok) return res.json();
+    if (res.ok) return accept.endsWith(".sha") ? res.text() : res.json();
     const retryable = res.status === 403 || res.status === 429 || res.status >= 500;
     if (retryable && attempt < 8) {
       const retryAfter = +res.headers.get("retry-after");
@@ -291,9 +294,10 @@ const fresh = new Map(); // repo -> skills fetched this run
 
 await pool(todo, CONCURRENCY, async (c, k) => {
   if (k && k % 250 === 0) log(`  checked ${k}/${todo.length}`);
-  let tree;
+  let sha, tree;
   try {
-    tree = await api(`/repos/${c.r}/git/trees/${encodeURIComponent(c.b)}?recursive=1`);
+    sha = await headCommit(c);
+    tree = await api(`/repos/${c.r}/git/trees/${sha}?recursive=1`);
   } catch (e) {
     if (e.status === 404 || e.status === 409) state.repos[c.r] = { u: c.u, n: 0, seen: now };
     else log(`  tree ${c.r}: ${e.message}`);
@@ -306,19 +310,33 @@ await pool(todo, CONCURRENCY, async (c, k) => {
   const skills = [];
   await pool(skillFiles, 6, async (file) => {
     const dir = file.path.includes("/") ? file.path.slice(0, file.path.lastIndexOf("/")) : ".";
-    const md = await raw(c.r, c.b, file.path);
+    const md = await raw(c.r, sha, file.path);
     if (md == null) return;
     const skill = toSkill(md, c, dir, path.posix.basename(file.path));
     if (!skill) return;
     skill.f = dir === "." ? blobs.length : blobs.filter((b) => b.path.startsWith(dir + "/")).length;
     skills.push(skill);
   });
-  state.repos[c.r] = { u: c.u, n: skills.length, seen: now };
+  state.repos[c.r] = { u: c.u, n: skills.length, seen: now, h: sha };
   if (skills.length) fresh.set(c.r, skills);
 });
 
-async function raw(repo, branch, file) {
-  const url = `https://raw.githubusercontent.com/${repo}/${encodeURIComponent(branch)}/${file.split("/").map(encodeURIComponent).join("/")}`;
+// Indexes written before commits were recorded: if a repo hasn't been pushed since it was read,
+// its branch head is still the commit that was indexed.
+const unpinned = [...candidates.values()].filter(
+  (c) => !fresh.has(c.r) && state.repos[c.r]?.n && !state.repos[c.r].h && state.repos[c.r].u === c.u,
+);
+if (unpinned.length) log(`Recording commits for ${unpinned.length} previously indexed repos`);
+await pool(unpinned, CONCURRENCY, async (c) => {
+  try { state.repos[c.r].h = await headCommit(c); } catch (e) { log(`  head ${c.r}: ${e.message}`); }
+});
+
+async function headCommit(c) {
+  return (await api(`/repos/${c.r}/commits/${encodeURIComponent(c.b)}`, { accept: "application/vnd.github.sha" })).trim();
+}
+
+async function raw(repo, ref, file) {
+  const url = `https://raw.githubusercontent.com/${repo}/${ref}/${file.split("/").map(encodeURIComponent).join("/")}`;
   for (let attempt = 0; attempt < 4; attempt++) {
     try {
       const res = await fetch(url);
@@ -355,6 +373,8 @@ for (const r of repoNames) {
     pub: pub?.name ?? (c?.owner ?? r.split("/")[0]),
     o: pub?.official ? 1 : 0,
   };
+  const h = state.repos[r].h ?? prev?.h;
+  if (h) repos[r].h = h;
   if (c?.archived) repos[r].a = 1;
   all.push(...(fresh.get(r) ?? prevSkills.get(r) ?? []));
 }

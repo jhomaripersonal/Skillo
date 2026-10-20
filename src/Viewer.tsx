@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { marked } from "marked";
 import DOMPurify from "dompurify";
 import type { Skill } from "./types";
-import { blobUrl, installCmd, isCaution, rawUrl, treeUrl } from "./skills";
+import { blobUrl, commitUrl, installCmd, isCaution, rawUrl, skillRef, treeUrl } from "./skills";
 import { Publisher } from "./SkillCard";
 import { CloseIcon, CopyIcon, ExternalIcon, StarIcon } from "./icons";
 import { motion } from "motion/react";
@@ -71,7 +71,7 @@ export default function Viewer({ skill: s, onClose, onCopy }: Props) {
     if (tab !== "files" || files) return;
     let live = true;
     const path = s.p === "." ? "" : s.p.split("/").map(encodeURIComponent).join("/");
-    fetch(`https://api.github.com/repos/${s.r}/contents/${path}?ref=${encodeURIComponent(s.repo.b)}`)
+    fetch(`https://api.github.com/repos/${s.r}/contents/${path}?ref=${encodeURIComponent(skillRef(s))}`)
       .then((r) => (r.ok ? r.json() : Promise.reject()))
       .then((list: Entry[]) => live && setFiles([...list].sort((a, b) => (a.type === b.type ? a.name.localeCompare(b.name) : a.type === "dir" ? -1 : 1))),
         () => live && setFiles("error"));
@@ -133,6 +133,8 @@ export default function Viewer({ skill: s, onClose, onCopy }: Props) {
             <span className={`tag${isCaution(s.license) ? " tag-warn" : ""}`}>{s.license}</span>
             {s.x ? <span className="tag" title="Identical copies found in other repos">+{s.x} {s.x === 1 ? "copy" : "copies"}</span> : null}
             {s.repo.a && <span className="tag tag-warn">Archived</span>}
+            {s.repo.h && <a className="tag tag-link" href={commitUrl(s)} target="_blank" rel="noopener"
+              title="Shown and installed at this exact commit">@{s.repo.h.slice(0, 7)}</a>}
           </div>
           <div className="install">
             <code>{cmd}</code>

@@ -245,6 +245,8 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1
 .card-copy:hover { border-color: var(--line-strong); }
 .tag { display: inline-flex; align-items: center; height: 24px; padding: 0 8px; border-radius: 5px; background: var(--surface-2); color: var(--ink-2); font-size: .8rem; font-weight: 600; white-space: nowrap; }
 .tag-warn { background: var(--warn-soft); color: var(--warn); }
+.tag-link { text-decoration: none; }
+.tag-link:hover { color: var(--accent); }
 
 /* Skeleton */
 .skeleton { min-height: 196px; }

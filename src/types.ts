@@ -7,6 +7,7 @@ export interface Repo {
   pub: string; // publisher display name
   o: 0 | 1; // official publisher
   a?: 1; // archived
+  h?: string; // commit the skills were read at
 }
 
 export interface RawSkill {
