@@ -1,8 +1,9 @@
 import { useEffect, useState, type FormEvent, type RefObject } from "react";
 import { animate, motion, useMotionValue, useReducedMotion, useTransform } from "motion/react";
-import { GitHubIcon, MoonIcon, SearchIcon, SunIcon } from "./icons";
+import { CoffeeIcon, GitHubIcon, MoonIcon, SearchIcon, SunIcon } from "./icons";
 
 const THEME_KEY = "skillo-theme";
+export const COFFEE_URL = "https://buymeacoffee.com/YOUR_USERNAME";
 const SUGGESTIONS = ["pdf", "testing", "mcp", "deploy", "security", "react", "data analysis"];
 
 function currentTheme(): "light" | "dark" {
@@ -62,6 +63,7 @@ export function TopBar({ showSearch, ...search }: SearchProps & { showSearch: bo
           <a href="#browse" className="nav-link">Browse</a>
           <a href="#how" className="nav-link">How it works</a>
           <a href="https://github.com/topics/agent-skills" className="icon-btn" target="_blank" rel="noopener" aria-label="Agent Skills on GitHub" title="Agent Skills on GitHub"><GitHubIcon /></a>
+          <a href={COFFEE_URL} className="icon-btn" target="_blank" rel="noopener" aria-label="Buy me a coffee" title="Buy me a coffee"><CoffeeIcon /></a>
           <ThemeToggle />
         </nav>
       </div>

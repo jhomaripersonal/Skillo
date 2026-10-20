@@ -4,7 +4,7 @@ import { loadIndex, score } from "./skills";
 import SkillCard, { Avatar, SkeletonCard } from "./SkillCard";
 import Viewer from "./Viewer";
 import FilterPanel, { DEFAULT_FILTERS, type Facet, type Filters, type Sort } from "./Filters";
-import { Hero, TopBar } from "./Header";
+import { COFFEE_URL, Hero, TopBar } from "./Header";
 import { CloseIcon, FilterIcon, ShieldIcon } from "./icons";
 import { copyText } from "./copy";
 import { AnimatePresence, motion } from "motion/react";
@@ -321,6 +321,7 @@ export default function App() {
         <div className="container footer-inner">
           <span>Skillo · an open index of Agent Skills</span>
           <span>Not affiliated with the listed publishers. Skills belong to their authors.</span>
+          <a className="footer-link" href={COFFEE_URL} target="_blank" rel="noopener">Buy me a coffee ☕</a>
         </div>
       </footer>
 

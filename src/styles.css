@@ -276,6 +276,8 @@ mark { background: var(--mark); color: inherit; border-radius: 2px; padding: 0 1
 
 .site-footer { border-top: 1px solid var(--line); padding-block: 24px calc(24px + env(safe-area-inset-bottom, 0px)); color: var(--ink-3); font-size: .88rem; }
 .footer-inner { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 8px 24px; }
+.footer-link { color: var(--ink-2); font-weight: 600; text-decoration: none; }
+.footer-link:hover { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 
 /* ---------- Overlays ---------- */
 .scrim { position: fixed; inset: 0; background: rgb(3 5 12 / .55); backdrop-filter: blur(6px); z-index: 20; }
