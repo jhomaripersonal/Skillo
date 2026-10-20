@@ -1,6 +1,7 @@
 import { StrictMode } from "react";
 import { createRoot } from "react-dom/client";
 import { MotionConfig } from "motion/react";
+import { Analytics } from "@vercel/analytics/react";
 import App from "./App";
 import "./styles.css";
 
@@ -10,5 +11,6 @@ createRoot(document.getElementById("root")!).render(
     <MotionConfig reducedMotion="user" transition={{ type: "spring", stiffness: 380, damping: 34 }}>
       <App />
     </MotionConfig>
+    <Analytics />
   </StrictMode>,
 );
